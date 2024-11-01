@@ -4,158 +4,121 @@
 enum coloracao { Vermelho, Preto };
 typedef enum coloracao Cor;
 
-typedef struct no {
-    struct no* pai;
-    struct no* esquerda;
-    struct no* direita;
+typedef struct noRN {
+    struct noRN* pai;
+    struct noRN* esquerda;
+    struct noRN* direita;
     Cor cor;
     int valor;
-} No;
+} NoRN;
 
-typedef struct arvore {
-    struct no* raiz;
-    struct no* nulo; 
-} ArvoreRubroNegra;
+typedef struct arvoreRN {
+    struct noRN* raiz;
+    struct noRN* nulo; 
+    unsigned int contador_balanceamentos; // Contador de balanceamentos
+} ArvoreRN;
 
-No* criarNo(Arvore*, No*, int);
-void balancear(Arvore*, No*);
-void rotacionarEsquerda(Arvore*, No*);
-void rotacionarDireita(Arvore*, No*);
+NoRN* criarNoRN(ArvoreRN*, NoRN*, int);
+void balancearRN(ArvoreRN*, NoRN*);
+void rotacionarEsquerdaRN(ArvoreRN*, NoRN*);
+void rotacionarDireitaRN(ArvoreRN*, NoRN*);
 
-Arvore* criar();
-int vazia(Arvore*);
-No* adicionar(Arvore*, int);
-No* localizar(Arvore* arvore, int valor);
-
-Arvore* criar() {
-    Arvore *arvore = malloc(sizeof(Arvore));
+ArvoreRN* criarRN() {
+    ArvoreRN *arvore = malloc(sizeof(ArvoreRN));
     arvore->nulo = NULL;
     arvore->raiz = NULL;
-
-    arvore->nulo = criarNo(arvore, NULL, 0);
+    arvore->nulo = criarNoRN(arvore, NULL, 0);
     arvore->nulo->cor = Preto;
-
+    arvore->contador_balanceamentos = 0; // Inicializa o contador
     return arvore;
 }
 
-int vazia(Arvore* arvore) {
-    return arvore->raiz == NULL;
-}
-
-No* criarNo(Arvore* arvore, No* pai, int valor) {
-    No* no = malloc(sizeof(No));
-
+NoRN* criarNoRN(ArvoreRN* arvore, NoRN* pai, int valor) {
+    NoRN* no = malloc(sizeof(NoRN));
     no->pai = pai;    
     no->valor = valor;
     no->direita = arvore->nulo;
     no->esquerda = arvore->nulo;
-
     return no;
 }
 
-No* adicionarNo(Arvore* arvore, No* no, int valor) {
+NoRN* adicionarNoRN(ArvoreRN* arvore, NoRN* no, int valor) {
     if (valor > no->valor) {
         if (no->direita == arvore->nulo) {
-            no->direita = criarNo(arvore, no, valor);     
+            no->direita = criarNoRN(arvore, no, valor);     
             no->direita->cor = Vermelho;       
-        		
             return no->direita;
         } else {
-            return adicionarNo(arvore, no->direita, valor);
+            return adicionarNoRN(arvore, no->direita, valor);
         }
     } else {
         if (no->esquerda == arvore->nulo) {
-            no->esquerda = criarNo(arvore, no, valor);
+            no->esquerda = criarNoRN(arvore, no, valor);
             no->esquerda->cor = Vermelho;
-            
             return no->esquerda;
         } else {
-            return adicionarNo(arvore, no->esquerda, valor);
+            return adicionarNoRN(arvore, no->esquerda, valor);
         }
     }
 }
 
-No* adicionar(Arvore* arvore, int valor) {
-    if (vazia(arvore)) {
-        arvore->raiz = criarNo(arvore, arvore->nulo, valor);
+NoRN* adicionarRN(ArvoreRN* arvore, int valor) {
+    if (arvore->raiz == NULL) {
+        arvore->raiz = criarNoRN(arvore, arvore->nulo, valor);
         arvore->raiz->cor = Preto;
-        	
         return arvore->raiz;
     } else {
-        No* no = adicionarNo(arvore, arvore->raiz, valor);
-        balancear(arvore, no);
-        
+        NoRN* no = adicionarNoRN(arvore, arvore->raiz, valor);
+        balancearRN(arvore, no);
         return no;
     }
 }
 
-No* localizar(Arvore* arvore, int valor) {
-    if (!vazia(arvore)) {
-        No* no = arvore->raiz;
-
-        while (no != arvore->nulo) {
-            if (no->valor == valor) {
-                return no;
-            } else {
-                no = valor < no->valor ? no->esquerda : no->direita;
-            }
-        }
-    }
-
-    return NULL;
-}
-
-void visitar(int valor){
-    printf("%d ", valor);
-}
-
-void balancear(Arvore* arvore, No* no) {
-    while (no->pai->cor == Vermelho) {
+void balancearRN(ArvoreRN* arvore, NoRN* no) {
+    while (no->pai != arvore->nulo && no->pai->cor == Vermelho) {
         if (no->pai == no->pai->pai->esquerda) {
-            No *tio = no->pai->pai->direita;
-            
+            NoRN *tio = no->pai->pai->direita;
             if (tio->cor == Vermelho) {
-                tio->cor = Preto; //Caso 1
+                tio->cor = Preto; // Caso 1
                 no->pai->cor = Preto; 
-
-                no->pai->pai->cor = Vermelho; //Caso 1
-                no = no->pai->pai; //Caso 1
+                no->pai->pai->cor = Vermelho; // Caso 1
+                no = no->pai->pai; // Caso 1
+                arvore->contador_balanceamentos++; // Incrementa o contador
             } else {
                 if (no == no->pai->direita) {
-                    no = no->pai; //Caso 2
-                    rotacionarEsquerda(arvore, no); //Caso 2
-                } else {
-                    no->pai->cor = Preto; 
-                    no->pai->pai->cor = Vermelho; //Caso 3
-                    rotacionarDireita(arvore, no->pai->pai); //Caso 3
+                    no = no->pai; // Caso 2
+                    rotacionarEsquerdaRN(arvore, no); // Caso 2
                 }
+                no->pai->cor = Preto; 
+                no->pai->pai->cor = Vermelho; // Caso 3
+                rotacionarDireitaRN(arvore, no->pai->pai); // Caso 3
+                arvore->contador_balanceamentos++; // Incrementa o contador
             }
         } else {
-            No *tio = no->pai->pai->esquerda;
-            
+            NoRN *tio = no->pai->pai->esquerda;
             if (tio->cor == Vermelho) {
-                tio->cor = Preto; //Caso 1
+                tio->cor = Preto; // Caso 1
                 no->pai->cor = Preto; 
-
-                no->pai->pai->cor = Vermelho; //Caso 1
-                no = no->pai->pai; //Caso 1
+                no->pai->pai->cor = Vermelho; // Caso 1
+                no = no->pai->pai; // Caso 1
+                arvore->contador_balanceamentos++; // Incrementa o contador
             } else {
                 if (no == no->pai->esquerda) {
-                    no = no->pai; //Caso 2
-                    rotacionarDireita(arvore, no); //Caso 2
-                } else {
-                    no->pai->cor = Preto; 
-                    no->pai->pai->cor = Vermelho; //Caso 3
-                    rotacionarEsquerda(arvore, no->pai->pai); //Caso 3
+                    no = no->pai; // Caso 2
+                    rotacionarDireitaRN(arvore, no); // Caso 2
                 }
+                no->pai->cor = Preto; 
+                no->pai->pai->cor = Vermelho; // Caso 3
+                rotacionarEsquerdaRN(arvore, no->pai->pai); // Caso 3
+                arvore->contador_balanceamentos++; // Incrementa o contador
             }
         }
     }
-    arvore->raiz->cor = Preto; //Conserta possível quebra regra 2
+    arvore->raiz->cor = Preto; // Conserta possível quebra regra 2
 }
 
-void rotacionarEsquerda(Arvore* arvore, No* no) {
-    No* direita = no->direita;
+void rotacionarEsquerdaRN(ArvoreRN* arvore, NoRN* no) {
+    NoRN* direita = no->direita;
     no->direita = direita->esquerda; 
 
     if (direita->esquerda != arvore->nulo) {
@@ -174,10 +137,11 @@ void rotacionarEsquerda(Arvore* arvore, No* no) {
 
     direita->esquerda = no;
     no->pai = direita;
+    arvore->contador_balanceamentos++; // Incrementa o contador
 }
 
-void rotacionarDireita(Arvore* arvore, No* no) {
-    No* esquerda = no->esquerda;
+void rotacionarDireitaRN(ArvoreRN* arvore, NoRN* no) {
+    NoRN* esquerda = no->esquerda;
     no->esquerda = esquerda->direita;
     
     if (esquerda->direita != arvore->nulo) {
@@ -196,16 +160,68 @@ void rotacionarDireita(Arvore* arvore, No* no) {
     
     esquerda->direita = no;
     no->pai = esquerda;
+    arvore->contador_balanceamentos++; // Incrementa o contador
 }
 
-int main() {
-    Arvore* a = criar();
+NoRN* removerNoRN(ArvoreRN* arvore, NoRN* no, int valor) {
+    if (valor < no->valor) {
+        return removerNoRN(arvore, no->esquerda, valor);
+    } else if (valor > no->valor) {
+        return removerNoRN(arvore, no->direita, valor);
+    } else {
+        if (no->esquerda == arvore->nulo) {
+            NoRN* temp = no->direita;
+            free(no);
+            return temp;
+        } else if (no->direita == arvore->nulo) {
+            NoRN* temp = no->esquerda;
+            free(no);
+            return temp;
+        } else {
+            NoRN* temp = no->esquerda;
+            while (temp->direita != arvore->nulo) {
+                temp = temp->direita;
+            }
+            no->valor = temp->valor;
+            no->esquerda = removerNoRN(arvore, no->esquerda, temp->valor);
+            return no;
+        }
+    }
+}
 
-    adicionar(a, 7);
-    adicionar(a, 6);
-    adicionar(a, 5);
-    adicionar(a, 4);
-    adicionar(a, 3);
-    adicionar(a, 2);
-    adicionar(a, 1);
+void removerRN(ArvoreRN* arvore, int valor) {
+    arvore->raiz = removerNoRN(arvore, arvore->raiz, valor);
+    balancearRN(arvore, arvore->raiz);
+}
+
+int contador_adicao_rubro_negra(int* v, int n) {
+    ArvoreRN* arvore = criarRN();
+    unsigned int contador = 0;
+
+    for (int i = 0; i < n; i++) {
+        adicionarRN(arvore, v[i]);
+        contador += arvore->contador_balanceamentos;
+        arvore->contador_balanceamentos = 0; // Reseta o contador
+    }
+
+    free(arvore);
+    return contador;
+}
+
+int contador_remocao_rubro_negra(int* v, int n) {
+    ArvoreRN* arvore = criarRN();
+    unsigned int contador = 0;
+
+    for (int i = 0; i < n; i++) {
+        adicionarRN(arvore, v[i]);
+    }
+
+    for (int i = 0; i < n; i++) {
+        removerRN(arvore, v[i]);
+        contador += arvore->contador_balanceamentos;
+        arvore->contador_balanceamentos = 0; // Reseta o contador
+    }
+
+    free(arvore);
+    return contador;
 }

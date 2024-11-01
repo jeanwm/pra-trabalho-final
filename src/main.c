@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "arvore-avl.h"         // arquivo de cabeçalho da árvore AVL
-#include "arvore-rubro-negra.h" // arquivo de cabeçalho da árvore rubro-negra
-#include "arvore-b.h"           // arquivo de cabeçalho da árvore B
+#include "oper/arvore-avl.h"         // arquivo de cabeçalho da árvore AVL
+#include "oper/arvore-rubro-negra.h" // arquivo de cabeçalho da árvore rubro-negra
+#include "oper/arvore-b.h"           // arquivo de cabeçalho da árvore B
 
 int* novo_vetor(int n) {
     int* v = malloc(sizeof(int) * n);
@@ -20,7 +20,7 @@ int* novo_vetor(int n) {
     return v;
 }
 
-void tempo_adicao_remocao(int n, FILE *fptr, int vezes) {
+void contador_adicao_remocao(int n, FILE *fptr, int vezes) {
     unsigned int
         arvoreAVLAdicao         = 0,
         arvoreRubroNegraAdicao  = 0,
@@ -32,15 +32,15 @@ void tempo_adicao_remocao(int n, FILE *fptr, int vezes) {
     for (int i = 0; i < vezes; i++) {
         int* v = novo_vetor(n);
 
-        // tempo para adição
-        arvoreAVLAdicao        += tempo_adicao_avl(v, n);
-        arvoreRubroNegraAdicao += tempo_adicao_rubro_negra(v, n);
-        arvoreBAdicao          += tempo_adicao_b(v, n);
+        // contador para adição
+        arvoreAVLAdicao        += contador_adicao_avl(v, n);
+        arvoreRubroNegraAdicao += contador_adicao_rubro_negra(v, n);
+        arvoreBAdicao          += contador_adicao_b(v, n);
 
-        // tempo para remoção
-        arvoreAVLRemocao        += tempo_remocao_avl(v, n);
-        arvoreRubroNegraRemocao += tempo_remocao_rubro_negra(v, n);
-        arvoreBRemocao          += tempo_remocao_b(v, n);
+        // contador para remoção
+        arvoreAVLRemocao        += contador_remocao_avl(v, n);
+        arvoreRubroNegraRemocao += contador_remocao_rubro_negra(v, n);
+        arvoreBRemocao          += contador_remocao_b(v, n);
 
         free(v);
     }
@@ -69,7 +69,7 @@ int main() {
     fprintf(fptr, "Iterações, AVL Adição, Rubro-Negra Adição, B Adição, AVL Remoção, Rubro-Negra Remoção, B Remoção\n");
 
     for (int n = 1; n <= limite; n++) {
-        tempo_adicao_remocao(n, fptr, vezes);
+        contador_adicao_remocao(n, fptr, vezes);
     }
 
     fclose(fptr);
