@@ -256,7 +256,7 @@ NoB* localizaChaveB(ArvoreB* arvore, int chave) {
     return NULL; // não encontrou
 }
 
-int contador_adicao_b(int n, int* v) {
+int contador_adicao_b(int* v, int n) {
     ArvoreB* arvore = criaArvoreB(1);
     contador = 0;
 
@@ -270,7 +270,7 @@ int contador_adicao_b(int n, int* v) {
     return resultado;
 }
 
-int contador_remocao_b(int n, int* v) {
+int contador_remocao_b(int* v, int n) {
     ArvoreB* arvore = criaArvoreB(1);
     contador = 0;
 

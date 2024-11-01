@@ -73,5 +73,6 @@ int main() {
     }
 
     fclose(fptr);
+    
     return EXIT_SUCCESS;
 }
