@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+// revisar contadores para ordem 5 e 10 (10 deve ser mais eficiente)
+
 // contador
 long int contadorB = 0;
 
