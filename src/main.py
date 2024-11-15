@@ -19,6 +19,7 @@ class Operacao:
 
 # funcoes
 def main():
+    # verifica pastas
     os.makedirs('build', exist_ok=True)
 
     if os.path.exists('auto'):
@@ -33,7 +34,7 @@ def main():
         except Exception as e:
             print(e)
 
-
+    # compila C
     subprocess.run(["gcc", "-o", "build/arvore-avl", "oper/arvore-avl.c"])
     subprocess.run(["gcc", "-o", "build/arvore-b", "oper/arvore-b.c"])
     subprocess.run(["gcc", "-o", "build/arvore-rubro-negra", "oper/arvore-rubro-negra.c"])
@@ -56,7 +57,7 @@ def main():
         for i in range(10):
             quantidade = (i + 1) * 1000
             criar_dataset(quantidade)
-            roda_operacao(Operacao.DELECAO , quantidade, writer)
+            roda_operacao(Operacao.DELECAO, quantidade, writer)
 
 
 def roda_operacao(operacao, quantidade, writer):
@@ -66,10 +67,10 @@ def roda_operacao(operacao, quantidade, writer):
     esforco_b_5         = []
     esforco_b_10        = []
 
-    for i in range(SUAVIZACAO):
+    for _ in range(SUAVIZACAO):
         esforco_avl.append(roda_arvore_avl(operacao))
         esforco_rubro_negra.append(roda_arvore_rubro_negra(operacao))
-        esforco_b_1.append(roda_arvore_b(2, operacao))
+        esforco_b_1.append(roda_arvore_b(1, operacao))
         esforco_b_5.append(roda_arvore_b(5, operacao))
         esforco_b_10.append(roda_arvore_b(10, operacao))
 
@@ -84,7 +85,7 @@ def roda_operacao(operacao, quantidade, writer):
 def criar_dataset(quantidade):
     with open('build/valores.txt', 'w') as file:
         for i in range(quantidade):
-            file.write(f'{random.randint(1, 2000)}\n')
+            file.write(f'{random.randint(1, 10000)}\n')
 
 def roda_arvore_avl(rotina):
     output = subprocess.run(["./build/arvore-avl", str(rotina)], capture_output=True, text=True)

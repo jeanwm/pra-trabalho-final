@@ -146,11 +146,13 @@ void remover(ArvoreAVL* arvore, int valor) {
             contadorAVL++;
             if (no->pai == NULL) {
                 arvore->raiz = filho;
+                
             } else {
-                if (no->pai->esquerda == no)
+                if (no->pai->esquerda == no) {
                     no->pai->esquerda = filho;
-                else
+                } else {
                     no->pai->direita = filho;
+                }
             }
 
             free(no);

@@ -3,8 +3,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-// revisar contadores para ordem 5 e 10 (10 deve ser mais eficiente)
-
 // contador
 long int contadorB = 0;
 
@@ -55,7 +53,8 @@ NoB* criaNoB(ArvoreB* arvore) {
     noB->filhos = malloc(sizeof(NoB) * (max + 2));
     noB->total  = 0;
 
-    for (int i = 0; i < max + 2; i++) {
+    int i = 0;
+    for (i = 0; i < max + 2; i++) {
         contadorB++;
 
         noB->filhos[i] = NULL;
@@ -75,8 +74,7 @@ int pesquisaBinariaB(NoB* noB, int chave) {
         contadorB++;
         if (noB->chaves[meio] == chave) {
             return meio;	
-        }
-        else if (noB->chaves[meio] > chave) {
+        } else if (noB->chaves[meio] > chave) {
             fim = meio - 1;
         } else {
             inicio = meio + 1;
@@ -108,9 +106,10 @@ NoB* localizaNoB(ArvoreB* arvore, int chave) {
 
 void adicionaChaveNoB(NoB* noB, NoB* novo, int chave) {
     int i = pesquisaBinariaB(noB, chave);
+    int j = 0;
 
     contadorB++;
-    for (int j = noB->total - 1; j >= i; j--) {
+    for (j = noB->total - 1; j >= i; j--) {
         contadorB++;
 
         noB->chaves[j + 1] = noB->chaves[j];
@@ -133,9 +132,10 @@ NoB* divideNoB(ArvoreB* arvore, NoB* noB) {
     int meio  = noB->total / 2;
     NoB* novo = criaNoB(arvore);
     novo->pai = noB->pai;
+    int i     = 0;
 
     contadorB++;
-    for (int i = meio + 1; i < noB->total; i++) {
+    for (i = meio + 1; i < noB->total; i++) {
         contadorB++;
 
         novo->filhos[novo->total] = noB->filhos[i];
@@ -235,7 +235,9 @@ void removerChaveRecursivoB(ArvoreB* arvore, NoB* noB, int chave) {
 
 void removerChaveNoB(NoB* noB, int indice) {
     contadorB++;
-    for (int i = indice; i < noB->total - 1; i++) {
+    int i = 0;
+
+    for (i = indice; i < noB->total - 1; i++) {
         contadorB++;
 
         noB->chaves[i] = noB->chaves[i + 1];
@@ -248,6 +250,7 @@ void removerChaveNoB(NoB* noB, int indice) {
 void rodaInsercaoB(FILE *file, int ordem) {
     ArvoreB* tree = criarArvoreB(ordem);
     int value;
+    
     while (fscanf(file, "%d", &value) != EOF) {
         inserir(tree, value);
     }
